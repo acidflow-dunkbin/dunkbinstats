@@ -3,7 +3,7 @@
 I can't belive DBS2.0 came out before DB2.0
 
 > [!NOTE]
-> You will need Dunkbin API credentials in order to fetch data and successfully build all dashboards. Look at the `.env.example` file. Create a new `.env` file and put the credentials there.
+> You will need Dunkbin API credentials in order to fetch data and successfully build the dashboards. Look at the `.env.example` file. Create a new `.env` file and put the credentials there.
 
 ### Install
 
