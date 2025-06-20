@@ -4,9 +4,13 @@ import JSZip from "jszip";
 
 dotenv.config();
 
+// Dunkbin API endpoints
 const cosmetics_url = "https://dunkbin.com/export/cosmetics";
 const users_url = "https://dunkbin.com/export/users";
 const backpacks_url = "https://dunkbin.com/export/backpacks";
+
+// NEW: Endpoint for the PFP extension map from the decoupled service
+const pfp_map_url = "https://dunkbinstats-users-images.acidflow.stream/pfp_map.json";
 
 const username = process.env.DUNKBIN_USER;
 const password = process.env.DUNKBIN_PASSWORD;
@@ -18,10 +22,10 @@ if (!username || !password) {
 const headers = new Headers();
 headers.set("Authorization", "Basic " + Buffer.from(`${username}:${password}`).toString("base64"));
 
-async function fetchData(url) {
-  const response = await fetch(url, { method: "GET", headers });
+async function fetchData(url, isJson = true) {
+  const response = await fetch(url, { method: "GET", headers: url.startsWith("https://dunkbin.com") ? headers : {} });
   if (!response.ok) throw new Error(`fetch failed for ${url}: ${response.status}`);
-  return await response.json();
+  return isJson ? await response.json() : await response.text();
 }
 
 const buildInfo = {
@@ -30,7 +34,6 @@ const buildInfo = {
   build_timestamp: new Date(),
 };
 
-// Layer mapping
 const layerMap = {
   4: "Hat",
   5: "Face",
@@ -41,14 +44,13 @@ const layerMap = {
 
 async function generateCosmeticsData() {
   try {
-    console.log("Fetching data from DunkBin API...");
-    const [cosmetics, users, backpacks] = await Promise.all([
+    const [cosmetics, users, backpacks, pfpMap] = await Promise.all([
       fetchData(cosmetics_url),
       fetchData(users_url),
       fetchData(backpacks_url),
+      fetchData(pfp_map_url),
     ]);
 
-    // Create users lookup map
     const usersMap = new Map();
     users.forEach((user) => {
       if (user && user.id) {
@@ -56,9 +58,7 @@ async function generateCosmeticsData() {
       }
     });
 
-    const filteredCosmetics = cosmetics.filter(
-      (cosmetic) => cosmetic.id !== 0 && cosmetic.id !== 161 && cosmetic.id !== 160
-    );
+    const filteredCosmetics = cosmetics.filter((cosmetic) => cosmetic.id !== 0);
     const cosmeticOwnership = new Map();
 
     backpacks.forEach((item) => {
@@ -74,21 +74,15 @@ async function generateCosmeticsData() {
     });
 
     const transformedCosmetics = filteredCosmetics.map((cosmetic) => {
-      const ownership = cosmeticOwnership.get(cosmetic.id) || {
-        total_quantity: 0,
-        unique_owners: new Set(),
-      };
-
-      let authorUser = null;
-      if (cosmetic.author && usersMap.has(cosmetic.author)) {
-        authorUser = usersMap.get(cosmetic.author);
-      }
+      const ownership = cosmeticOwnership.get(cosmetic.id) || { total_quantity: 0, unique_owners: new Set() };
+      const authorUser = cosmetic.author ? usersMap.get(cosmetic.author) : null;
       const authorName = authorUser ? authorUser.display_name : cosmetic.author || "Unknown";
-      const authorPfp = authorUser
-        ? `${authorUser.id}.png`
-        : cosmetic.author
-        ? `${cosmetic.author}.png`
-        : "no_image_available.png";
+
+      let authorPfp = "no_image_available.png";
+      if (cosmetic.author && pfpMap[cosmetic.author]) {
+        const extension = pfpMap[cosmetic.author];
+        authorPfp = `${cosmetic.author}.${extension}`;
+      }
 
       return {
         id: cosmetic.id,
@@ -98,8 +92,6 @@ async function generateCosmeticsData() {
         author: cosmetic.author,
         author_name: authorName,
         author_pfp: authorPfp,
-        delay: cosmetic.delay,
-        md5: cosmetic.md5,
         price: cosmetic.currentCost || 0,
         image: `${cosmetic.id}.png`,
         total_owned: ownership.total_quantity,
@@ -112,37 +104,23 @@ async function generateCosmeticsData() {
 
     const jsonPath = "./src/data/cosmetics.json";
     fs.writeFileSync(jsonPath, JSON.stringify(transformedCosmetics, null, 2), "utf-8");
-    console.log(`Enhanced ${transformedCosmetics.length} cosmetics with ownership data`);
 
     const zip = new JSZip();
-    const jsonContent = fs.readFileSync(jsonPath);
-    zip.file("cosmetics.json", jsonContent, {
-      compression: "DEFLATE",
-      compressionOptions: { level: 9 },
-    });
-
-    const zipPath = "./src/data/cosmetics.zip";
+    zip.file("cosmetics.json", fs.readFileSync(jsonPath));
     const zipContent = await zip.generateAsync({
       type: "nodebuffer",
       compression: "DEFLATE",
       compressionOptions: { level: 9 },
     });
-    fs.writeFileSync(zipPath, zipContent);
+
+    fs.writeFileSync("./src/data/cosmetics.zip", zipContent);
+    fs.unlinkSync(jsonPath);
 
     // Write build info to separate file
     fs.writeFileSync("./src/data/buildDate.json", JSON.stringify(buildInfo, null, 2));
     console.log("Wrote build info to builddate.json");
 
-    const jsonSize = fs.statSync(jsonPath).size;
-    const zipSize = fs.statSync(zipPath).size;
-    console.log(`JSON size: ${(jsonSize / 1024).toFixed(2)} KB`);
-    console.log(`ZIP size: ${(zipSize / 1024).toFixed(2)} KB`);
-    console.log(`Compression ratio: ${((1 - zipSize / jsonSize) * 100).toFixed(2)}%`);
-
-    if (fs.existsSync(zipPath)) {
-      fs.unlinkSync(jsonPath);
-      console.log("Successfully created ZIP and removed JSON file");
-    }
+    console.log(`Successfully generated cosmetics.zip`);
   } catch (error) {
     console.error("Error generating cosmetics data:", error);
     throw error;
