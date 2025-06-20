@@ -1,0 +1,13 @@
+{
+  "name": "dunkbinstats",
+  "compatibility_date": "2025-06-20",
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [
+    {
+      "pattern": "dunkbinstats.runfast.stream",
+      "custom_domain": true
+    }
+  ]
+}
