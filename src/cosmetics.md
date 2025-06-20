@@ -24,6 +24,9 @@ const cosmetics = await cosmeticsZip.file("cosmetics.json").json();
 const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
+
+const pfpMappingZip = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
+const pfpMapping = await pfpMappingZip.file("pfp_map.json").json();
 ```
 
 ```js
@@ -48,10 +51,23 @@ const avgCosmeticPrice = d3.mean(
 ```
 
 ```js
+// Helper function to get PFP filename from mapping
+function getPfpFilename(authorId) {
+  if (!authorId || !pfpMapping.users[authorId]) {
+    return "no_image_available.png";
+  }
+  return pfpMapping.users[authorId].pfp_filename || "no_image_available.png";
+}
+```
+
+```js
 cosmetics.forEach((cosmetic) => {
+  // Use the PFP mapping to get the correct filename
+  const pfpFilename = getPfpFilename(cosmetic.author_id);
+
   cosmetic.combinedArtistName = {
     artistName: cosmetic.author_name,
-    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${cosmetic.author_pfp}`,
+    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${pfpFilename}`,
     ...(cosmetic.author_name !== "Unknown" && {
       twitch_url: `https://twitch.tv/${cosmetic.author_name.toLowerCase()}`,
     }),
@@ -166,7 +182,8 @@ const cosmeticsTable = Inputs.table(cosmeticsSearchValue, {
         <img src="${d.portrait_url}"
           width=${sweatlingSizeSelectorInputValue / 3}
           height=${sweatlingSizeSelectorInputValue / 3}
-          style="image-rendering:pixelated; flex-shrink: 0;" />
+          style="image-rendering:pixelated; flex-shrink: 0;" 
+          onerror="this.src='https://dunkbinstats-users-images.acidflow.stream/users_pfps/no_image_available.png'" />
         <span style="white-space: nowrap; color: currentColor;">${d.artistName}</span>
       </div>`;
       return d.twitch_url ? htl.html`<a href="${d.twitch_url}">${content}</a>` : content;

@@ -22,6 +22,9 @@ const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
 
+const pfpMappingZip = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
+const pfpMapping = await pfpMappingZip.file("pfp_map.json").json();
+
 initializeTitleAnimation();
 ```
 
@@ -44,6 +47,16 @@ const totalSweatSpent = backpacks.reduce((sum, d) => {
 ```
 
 ```js
+// Helper function to get PFP filename from mapping
+function getPfpFilename(userId) {
+  if (!userId || !pfpMapping.users[userId]) {
+    return "no_image_available.png";
+  }
+  return pfpMapping.users[userId].pfp_filename || "no_image_available.png";
+}
+```
+
+```js
 const usersSearch = Inputs.search(user_stats, {
   placeholder: "Search dunkbin users",
   query: "",
@@ -53,9 +66,12 @@ const usersSearch = Inputs.search(user_stats, {
 
 ```js
 user_stats.forEach((user) => {
+  // Use the PFP mapping to get the correct filename
+  const pfpFilename = getPfpFilename(user.id);
+
   user.combinedUserName = {
     twitchUsername: user.display_name,
-    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${user.user_pfp}`,
+    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${pfpFilename}`,
     ...(user.login && {
       twitch_url: `https://twitch.tv/${user.login}`,
     }),
