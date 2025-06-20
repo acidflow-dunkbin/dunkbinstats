@@ -13,6 +13,9 @@ import { initializeTitleAnimation } from "./components/shared/titleAnimation.js"
 import { topCompletionistsPlot } from "./components/backpacks/topCompletionistsPlot.js";
 import { collectionCompletenessPlot } from "./components/backpacks/collectionCompletenessPlot.js";
 import { topSpendersPlot } from "./components/backpacks/topSpendersPlot.js";
+import JSZip from "jszip";
+
+initializeTitleAnimation();
 
 const backpacksZip = await FileAttachment("./data/backpacks.zip").zip();
 const backpacks = await backpacksZip.file("backpacks.json").json();
@@ -22,10 +25,15 @@ const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
 
-const pfpMappingZip = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
-const pfpMapping = await pfpMappingZip.file("pfp_map.json").json();
+// const pfpMappingZip = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+// const pfpMappingZipAttach = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
+// const pfpMapping = await pfpMappingZipAttach.file("pfp_map.json").json();
 
-initializeTitleAnimation();
+const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+const pfpMappingBlob = await pfpMappingResponse.blob();
+const pfpMappingZip = await JSZip.loadAsync(pfpMappingBlob);
+const pfpMappingText = await pfpMappingZip.file("pfp_map.json").async("text");
+const pfpMapping = JSON.parse(pfpMappingText);
 ```
 
 ```js
