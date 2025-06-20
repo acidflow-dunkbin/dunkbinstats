@@ -2,7 +2,8 @@
   "name": "dunkbinstats",
   "compatibility_date": "2025-06-20",
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS"
   },
   "routes": [
     {
