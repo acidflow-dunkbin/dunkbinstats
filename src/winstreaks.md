@@ -13,7 +13,8 @@ initializeTitleAnimation();
 ```
 
 ```js
-const dunkbinUsers = FileAttachment("./data/dunkbin_users_database.json").json();
+const dunkbinUsersZip = await FileAttachment("./data/dunkbin_users_database.zip").zip();
+const dunkbinUsers = await dunkbinUsersZip.file("dunkbin_users_database.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
 ```
 
