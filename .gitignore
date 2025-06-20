@@ -148,3 +148,4 @@ yarn-error.log
 src/data/users.zip
 src/data/backpacks.zip
 src/data/cosmetics.zip
+!src/data/dunkbin_users_database.zip
