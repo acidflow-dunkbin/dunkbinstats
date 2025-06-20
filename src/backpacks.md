@@ -137,7 +137,7 @@ const usersTable = Inputs.table(usersSearchValue, {
   </div>
   <div class="card" style="text-align: center; padding: 1.5rem;">
     <div class="big">${totalSweatSpent?.toLocaleString()}&#8288;💧</div>
-    <div>Total sweat spent by all users</div>
+    <div>Total sweat spent</div>
   </div>
 </div>
 
