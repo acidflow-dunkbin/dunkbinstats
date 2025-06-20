@@ -1,0 +1,32 @@
+[
+  {
+    "icon": "icons/hat.png",
+    "name": "Hat",
+    "layerIcon": "hat.png",
+    "layer": 4
+  },
+  {
+    "icon": "icons/face.png",
+    "name": "Face",
+    "layerIcon": "face.png",
+    "layer": 5
+  },
+  {
+    "icon": "icons/full%20head.png",
+    "name": "Full Head",
+    "layerIcon": "full%20head.png",
+    "layer": 6
+  },
+  {
+    "icon": "icons/neck.png",
+    "name": "Neck",
+    "layerIcon": "neck.png",
+    "layer": 7
+  },
+  {
+    "icon": "icons/body.png",
+    "name": "Body",
+    "layerIcon": "body.png",
+    "layer": 8
+  }
+]
