@@ -29,6 +29,9 @@ const buildDate = await FileAttachment("./data/buildDate.json").json();
 // const pfpMappingZipAttach = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
 // const pfpMapping = await pfpMappingZipAttach.file("pfp_map.json").json();
 
+// const pfpMappingZip = await FileAttachment("./data/pfp_map.zip").zip();
+// const pfpMapping = await pfpMappingZip.file("pfp_map.json").json();
+
 const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
 const pfpMappingBlob = await pfpMappingResponse.blob();
 const pfpMappingZip = await JSZip.loadAsync(pfpMappingBlob);
