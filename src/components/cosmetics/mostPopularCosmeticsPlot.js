@@ -4,7 +4,7 @@ import * as d3 from "npm:d3";
 export function mostPopularCosmeticsPlot(backpacks, width = 640) {
   const itemCounts = d3.rollup(
     backpacks.filter((d) => d?.item_name),
-    (v) => v.length,
+    (items) => d3.sum(items, (d) => d.quantity || 0),
     (d) => d.item_name
   );
 
