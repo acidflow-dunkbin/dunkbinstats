@@ -11,6 +11,10 @@ export function topExpensiveCosmeticsPlot(cosmetics, width = 640) {
       price: item.price,
     }));
 
+  // Calculate dynamic margin based on longest cosmetic name
+  const maxLabelLength = Math.max(...topItems.map((d) => d.name.length));
+  const dynamicMargin = Math.max(120, Math.min(maxLabelLength * 6 + 15, 200));
+
   const sixHundredthWin = topItems.find((d) => d.name === "600th Win");
 
   if (!sixHundredthWin) {
@@ -24,11 +28,12 @@ export function topExpensiveCosmeticsPlot(cosmetics, width = 640) {
     color: {
       scheme: "ylgnbu",
     },
-    marginLeft: Math.min(100, width * 0.15),
+    marginLeft: dynamicMargin,
     marginRight: Math.min(80, width * 0.12),
     x: {
       label: "Price (Sweat)",
       tickFormat: "~s",
+      insetRight: 20,
     },
     y: {
       label: null,

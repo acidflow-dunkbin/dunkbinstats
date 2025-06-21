@@ -12,12 +12,16 @@ export function mostPopularCosmeticsPlot(backpacks, width = 640) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 15);
 
+  // Calculate dynamic margin based on longest item name
+  const maxLabelLength = Math.max(...topItems.map((d) => d.item.length));
+  const dynamicMargin = Math.max(120, Math.min(maxLabelLength * 6 + 15, 200));
+
   return Plot.plot({
     width,
     color: {
       scheme: "ylgnbu",
     },
-    marginLeft: Math.min(100, width * 0.15),
+    marginLeft: dynamicMargin,
     marginRight: Math.min(80, width * 0.12),
     x: {
       label: "Number of owners",
