@@ -25,18 +25,18 @@ const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
 
-// const pfpMappingZip = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
-// const pfpMappingZipAttach = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
-// const pfpMapping = await pfpMappingZipAttach.file("pfp_map.json").json();
+const pfpMappingZip = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+const pfpMappingZipAttach = await FileAttachment("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip").zip();
+const pfpMapping = await pfpMappingZipAttach.file("pfp_map.json").json();
 
 // const pfpMappingZip = await FileAttachment("./data/pfp_map.zip").zip();
 // const pfpMapping = await pfpMappingZip.file("pfp_map.json").json();
 
-const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
-const pfpMappingBlob = await pfpMappingResponse.blob();
-const pfpMappingZip = await JSZip.loadAsync(pfpMappingBlob);
-const pfpMappingText = await pfpMappingZip.file("pfp_map.json").async("text");
-const pfpMapping = JSON.parse(pfpMappingText);
+// const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+// const pfpMappingBlob = await pfpMappingResponse.blob();
+// const pfpMappingZip = await JSZip.loadAsync(pfpMappingBlob);
+// const pfpMappingText = await pfpMappingZip.file("pfp_map.json").async("text");
+// const pfpMapping = JSON.parse(pfpMappingText);
 ```
 
 ```js
