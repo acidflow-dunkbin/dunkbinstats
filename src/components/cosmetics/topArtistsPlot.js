@@ -12,12 +12,18 @@ export function topArtistsPlot(cosmetics, width = 640) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 15);
 
+  // Calculate dynamic margin based on longest artist name
+  const maxLabelLength = Math.max(...topArtists.map((d) => d.artist.length));
+  const dynamicMargin = Math.max(120, Math.min(maxLabelLength * 6 + 15, 200));
+
+  const fontSize = width < 500 ? 12 : 14;
+
   return Plot.plot({
     width,
     color: {
       scheme: "ylgnbu",
     },
-    marginLeft: Math.min(100, width * 0.15),
+    marginLeft: dynamicMargin,
     marginRight: Math.min(80, width * 0.12),
     x: {
       label: "Number of cosmetics",
@@ -49,7 +55,7 @@ export function topArtistsPlot(cosmetics, width = 640) {
         text: (d) => d.count,
         textAnchor: "start",
         dx: 5,
-        fontSize: width < 500 ? 12 : 14,
+        fontSize: fontSize,
       }),
     ],
   });

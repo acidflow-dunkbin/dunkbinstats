@@ -5,7 +5,7 @@ title: Backpacks
 <link href="custom.css" rel="stylesheet"></link>
 
 <h1 id="backpacksTitle" class="acid-title bartender-heading-decrypted">Backpacks</h1>
-<h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
+<h6 id="backpacksTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
 import { wuoteLogo } from "./components/shared/wuoteLogo.js";
@@ -13,7 +13,12 @@ import { initializeTitleAnimation } from "./components/shared/titleAnimation.js"
 import { topCompletionistsPlot } from "./components/backpacks/topCompletionistsPlot.js";
 import { collectionCompletenessPlot } from "./components/backpacks/collectionCompletenessPlot.js";
 import { topSpendersPlot } from "./components/backpacks/topSpendersPlot.js";
+import JSZip from "jszip";
 
+initializeTitleAnimation();
+```
+
+```js
 const backpacksZip = await FileAttachment("./data/backpacks.zip").zip();
 const backpacks = await backpacksZip.file("backpacks.json").json();
 const cosmeticsZip = await FileAttachment("./data/cosmetics.zip").zip();
@@ -21,12 +26,42 @@ const cosmetics = await cosmeticsZip.file("cosmetics.json").json();
 const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
+```
 
-initializeTitleAnimation();
+```js
+// Load remote PFP mapping
+let pfpMapping = { users: {} };
+
+try {
+  const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+
+  if (pfpMappingResponse.ok) {
+    const pfpMappingArrayBuffer = await pfpMappingResponse.arrayBuffer();
+    const pfpMappingZip = await JSZip.loadAsync(pfpMappingArrayBuffer);
+    const pfpMapFile = pfpMappingZip.file("pfp_map.json");
+
+    if (pfpMapFile) {
+      const pfpMappingText = await pfpMapFile.async("text");
+      pfpMapping = JSON.parse(pfpMappingText);
+    }
+  }
+} catch (error) {
+  console.error("Failed to load PFP mapping:", error);
+}
 ```
 
 ```js
 const buildTimestamp = new Date(buildDate.build_timestamp);
+```
+
+```js
+// Helper function to get PFP filename from mapping
+function getPfpFilename(userId) {
+  if (!userId || !pfpMapping.users || !pfpMapping.users[userId]) {
+    return "no_image_available.png";
+  }
+  return pfpMapping.users[userId].pfp_filename || "no_image_available.png";
+}
 ```
 
 ```js
@@ -44,22 +79,23 @@ const totalSweatSpent = backpacks.reduce((sum, d) => {
 ```
 
 ```js
-const usersSearch = Inputs.search(user_stats, {
-  placeholder: "Search dunkbin users",
-  query: "",
-  autocomplete: true,
-});
-```
-
-```js
 user_stats.forEach((user) => {
+  const pfpFilename = getPfpFilename(user.user_id);
   user.combinedUserName = {
     twitchUsername: user.display_name,
-    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${user.user_pfp}`,
+    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${pfpFilename}`,
     ...(user.login && {
       twitch_url: `https://twitch.tv/${user.login}`,
     }),
   };
+});
+```
+
+```js
+const usersSearch = Inputs.search(user_stats, {
+  placeholder: "Search dunkbin users",
+  query: "",
+  autocomplete: true,
 });
 ```
 
@@ -147,16 +183,16 @@ const usersTable = Inputs.table(usersSearchValue, {
     <h2>Top 15 most complete collections</h2>
     ${resize((width) => topCompletionistsPlot(user_stats, width))}
   </div>
-  <div class="card" style="margin-bottom: 2rem;">
-  <h2>Top 15 big spenders</h2>
-  ${resize((width) => topSpendersPlot(user_stats, width))}
-</div>
-  
-</div>
-<div class="card">
-    <h2>Collection completeness distribution</h2>
-    ${resize((width) => collectionCompletenessPlot(user_stats, width))}
+  <div class="card">
+    <h2>Top 15 big spenders</h2>
+    ${resize((width) => topSpendersPlot(user_stats, width))}
   </div>
+</div>
+
+<div class="card">
+  <h2>Collection completeness distribution</h2>
+  ${resize((width) => collectionCompletenessPlot(user_stats, width))}
+</div>
 
 <div class="card" style="margin-bottom: 1rem;">
   <h2>User Search & Statistics</h2>

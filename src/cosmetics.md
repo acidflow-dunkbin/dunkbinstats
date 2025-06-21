@@ -14,9 +14,12 @@ import { topArtistsPlot } from "./components/cosmetics/topArtistsPlot.js";
 import { cosmeticLayerPopularityPlot } from "./components/cosmetics/cosmeticLayerPopularityPlot.js";
 import { mostPopularCosmeticsPlot } from "./components/cosmetics/mostPopularCosmeticsPlot.js";
 import { topExpensiveCosmeticsPlot } from "./components/cosmetics/topExpensiveCosmeticsPlot.js";
+import JSZip from "jszip";
 
 initializeTitleAnimation();
+```
 
+```js
 const backpacksZip = await FileAttachment("./data/backpacks.zip").zip();
 const backpacks = await backpacksZip.file("backpacks.json").json();
 const cosmeticsZip = await FileAttachment("./data/cosmetics.zip").zip();
@@ -27,31 +30,49 @@ const buildDate = await FileAttachment("./data/buildDate.json").json();
 ```
 
 ```js
+// Load remote PFP mapping
+let pfpMapping = { users: {} };
+
+try {
+  const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+
+  if (pfpMappingResponse.ok) {
+    const pfpMappingArrayBuffer = await pfpMappingResponse.arrayBuffer();
+    const pfpMappingZip = await JSZip.loadAsync(pfpMappingArrayBuffer);
+    const pfpMapFile = pfpMappingZip.file("pfp_map.json");
+
+    if (pfpMapFile) {
+      const pfpMappingText = await pfpMapFile.async("text");
+      pfpMapping = JSON.parse(pfpMappingText);
+    }
+  }
+} catch (error) {
+  console.error("Failed to load PFP mapping:", error);
+}
+```
+
+```js
 const buildTimestamp = new Date(buildDate.build_timestamp);
 ```
 
 ```js
-const totalSweatSpent = backpacks.reduce((sum, d) => {
-  const price = Number(d.item_price);
-  const qty = Number(d.quantity) || 1;
-  return sum + (isNaN(price) ? 0 : price * qty);
-}, 0);
-
-const totalUniqueCosmetics = cosmetics.length;
-const totalArtists = new Set(
-  cosmetics.filter((d) => d.author_name && d.author_name !== "Unknown").map((d) => d.author_name)
-).size;
-const avgCosmeticPrice = d3.mean(
-  cosmetics.filter((d) => d.price > 0),
-  (d) => d.price
-);
+// Helper function to get PFP filename from mapping
+function getPfpFilename(userId) {
+  if (!userId || !pfpMapping.users || !pfpMapping.users[userId]) {
+    return "no_image_available.png";
+  }
+  return pfpMapping.users[userId].pfp_filename || "no_image_available.png";
+}
 ```
 
 ```js
 cosmetics.forEach((cosmetic) => {
+  // Use the PFP mapping to get the correct filename - using 'author' which contains the user ID
+  const pfpFilename = getPfpFilename(cosmetic.author);
+
   cosmetic.combinedArtistName = {
     artistName: cosmetic.author_name,
-    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${cosmetic.author_pfp}`,
+    portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${pfpFilename}`,
     ...(cosmetic.author_name !== "Unknown" && {
       twitch_url: `https://twitch.tv/${cosmetic.author_name.toLowerCase()}`,
     }),
@@ -62,6 +83,25 @@ cosmetics.forEach((cosmetic) => {
     dunkbin_url: `https://dunkbin.com/shop?items=${cosmetic.id}`,
   };
 });
+```
+
+```js
+const totalSweatSpent = backpacks.reduce((sum, d) => {
+  const price = Number(d.item_price);
+  const qty = Number(d.quantity) || 1;
+  return sum + (isNaN(price) ? 0 : price * qty);
+}, 0);
+```
+
+```js
+const totalUniqueCosmetics = cosmetics.length;
+const totalArtists = new Set(
+  cosmetics.filter((d) => d.author_name && d.author_name !== "Unknown").map((d) => d.author_name)
+).size;
+const avgCosmeticPrice = d3.mean(
+  cosmetics.filter((d) => d.price > 0),
+  (d) => d.price
+);
 ```
 
 ```js
@@ -166,7 +206,8 @@ const cosmeticsTable = Inputs.table(cosmeticsSearchValue, {
         <img src="${d.portrait_url}"
           width=${sweatlingSizeSelectorInputValue / 3}
           height=${sweatlingSizeSelectorInputValue / 3}
-          style="image-rendering:pixelated; flex-shrink: 0;" />
+          style="image-rendering:pixelated; flex-shrink: 0;" 
+          onerror="this.src='https://dunkbinstats-users-images.acidflow.stream/users_pfps/no_image_available.png'" />
         <span style="white-space: nowrap; color: currentColor;">${d.artistName}</span>
       </div>`;
       return d.twitch_url ? htl.html`<a href="${d.twitch_url}">${content}</a>` : content;

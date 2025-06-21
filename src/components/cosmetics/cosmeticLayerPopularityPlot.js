@@ -11,16 +11,21 @@ export function cosmeticLayerPopularityPlot(cosmetics, width = 640) {
 
   const layerData = Array.from(layerCounts, ([layer, count]) => ({ layer, count }));
 
+  // Calculate dynamic margin based on longest layer name
+  const maxLabelLength = Math.max(...layerData.map((d) => d.layer.length));
+  const dynamicMargin = Math.max(80, Math.min(maxLabelLength * 6 + 15, 180));
+
   return Plot.plot({
     width,
     height: 300,
-    marginLeft: Math.min(80, width * 0.12),
+    marginLeft: dynamicMargin,
     marginRight: Math.min(80, width * 0.12),
     color: {
       scheme: "ylgnbu",
     },
     x: {
       label: "Number of cosmetics",
+      insetRight: 60,
     },
     y: {
       label: null,

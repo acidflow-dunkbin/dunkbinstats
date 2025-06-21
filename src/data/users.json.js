@@ -4,9 +4,12 @@ import JSZip from "jszip";
 
 dotenv.config();
 
+// Dunkbin API endpoints
 const users_url = "https://dunkbin.com/export/users";
 const backpacks_url = "https://dunkbin.com/export/backpacks";
 const cosmetics_url = "https://dunkbin.com/export/cosmetics";
+
+const pfp_map_url = "https://dunkbinstats-users-images.acidflow.stream/pfp_map.json";
 
 const username = process.env.DUNKBIN_USER;
 const password = process.env.DUNKBIN_PASSWORD;
@@ -18,48 +21,35 @@ if (!username || !password) {
 const headers = new Headers();
 headers.set("Authorization", "Basic " + Buffer.from(`${username}:${password}`).toString("base64"));
 
-async function fetchData(url) {
-  const response = await fetch(url, { method: "GET", headers });
+async function fetchData(url, isJson = true) {
+  const response = await fetch(url, { method: "GET", headers: url.startsWith("https://dunkbin.com") ? headers : {} });
   if (!response.ok) throw new Error(`fetch failed for ${url}: ${response.status}`);
-  return await response.json();
+  return isJson ? await response.json() : await response.text();
 }
 
 async function generateUserStats() {
   try {
-    console.log("Fetching data from DunkBin API...");
-    const [users, backpacks, cosmetics] = await Promise.all([
+    const [users, backpacks, cosmetics, pfpMap] = await Promise.all([
       fetchData(users_url),
       fetchData(backpacks_url),
       fetchData(cosmetics_url),
+      fetchData(pfp_map_url),
     ]);
 
-    // Create cosmetics lookup map
-    const cosmeticsMap = new Map();
-    cosmetics.forEach((cosmetic) => {
-      if (cosmetic.id !== 0 && cosmetic.id !== 161 && cosmetic.id !== 160) {
-        cosmeticsMap.set(cosmetic.id, cosmetic);
-      }
-    });
+    const cosmeticsMap = new Map(
+      cosmetics.filter((c) => c.id !== 0 && c.id !== 161 && c.id !== 160).map((c) => [c.id, c])
+    );
 
-    // Create users lookup map
-    const usersMap = new Map();
-    users.forEach((user) => {
-      usersMap.set(user.id, user);
-    });
-
-    // Calculate user statistics
+    const usersMap = new Map(users.map((u) => [u.id, u]));
     const userStats = new Map();
 
     backpacks.forEach((item) => {
-      const userId = item.user_id;
-      const cosmetic = cosmeticsMap.get(item.item_id);
+      if (!usersMap.has(item.user_id) || !cosmeticsMap.has(item.item_id)) return;
 
-      if (!cosmetic || !usersMap.has(userId)) return;
-
-      if (!userStats.has(userId)) {
-        const user = usersMap.get(userId);
-        userStats.set(userId, {
-          user_id: userId,
+      if (!userStats.has(item.user_id)) {
+        const user = usersMap.get(item.user_id);
+        userStats.set(item.user_id, {
+          user_id: user.id,
           login: user.login,
           display_name: user.display_name,
           total_items_owned: 0,
@@ -70,65 +60,50 @@ async function generateUserStats() {
         });
       }
 
-      const stats = userStats.get(userId);
-      const itemCost = cosmetic.currentCost || 0;
-
+      const stats = userStats.get(item.user_id);
+      const cosmetic = cosmeticsMap.get(item.item_id);
       stats.total_items_owned += item.qty;
-      stats.total_items_cost += itemCost * item.qty;
+      stats.total_items_cost += (cosmetic.currentCost || 0) * item.qty;
 
       if (!stats.items.has(item.item_id)) {
         stats.items.add(item.item_id);
         stats.unique_items_owned += 1;
-        stats.unique_items_cost += itemCost;
+        stats.unique_items_cost += cosmetic.currentCost || 0;
       }
     });
 
-    const totalUniqueItems = Array.from(cosmeticsMap.values()).length;
+    const totalUniqueItems = cosmeticsMap.size;
+    const userStatsArray = Array.from(userStats.values()).map((stats) => {
+      let userPfpFile = "no_image_available.png";
+      if (stats.user_id && pfpMap[stats.user_id]) {
+        userPfpFile = `${stats.user_id}.${pfpMap[stats.user_id]}`;
+      }
 
-    const userStatsArray = Array.from(userStats.values()).map((stats) => ({
-      user_id: stats.user_id,
-      login: stats.login,
-      display_name: stats.display_name,
-      total_items_owned: stats.total_items_owned,
-      unique_items_owned: stats.unique_items_owned,
-      unique_items_cost: stats.unique_items_cost,
-      total_items_cost: stats.total_items_cost,
-      collection_completion_percentage: parseInt((stats.unique_items_owned / totalUniqueItems) * 100),
-      // Store filename that external service will serve
-      user_pfp: stats.user_id ? `${stats.user_id}.png` : "no_image_available.png",
-    }));
+      return {
+        ...stats,
+        collection_completion_percentage:
+          totalUniqueItems > 0 ? Math.round((stats.unique_items_owned / totalUniqueItems) * 100) : 0,
+        user_pfp: userPfpFile,
+      };
+    });
 
-    userStatsArray.sort((a, b) => b.total_items_owned - a.total_items_owned);
+    userStatsArray.sort((a, b) => b.collection_completion_percentage - a.collection_completion_percentage);
 
     const jsonPath = "./src/data/users.json";
     fs.writeFileSync(jsonPath, JSON.stringify(userStatsArray, null, 2), "utf-8");
-    console.log(`Generated stats for ${userStatsArray.length} users`);
 
     const zip = new JSZip();
-    const jsonContent = fs.readFileSync(jsonPath);
-    zip.file("users.json", jsonContent, {
-      compression: "DEFLATE",
-      compressionOptions: { level: 9 },
-    });
-
-    const zipPath = "./src/data/users.zip";
+    zip.file("users.json", fs.readFileSync(jsonPath));
     const zipContent = await zip.generateAsync({
       type: "nodebuffer",
       compression: "DEFLATE",
       compressionOptions: { level: 9 },
     });
-    fs.writeFileSync(zipPath, zipContent);
 
-    const jsonSize = fs.statSync(jsonPath).size;
-    const zipSize = fs.statSync(zipPath).size;
-    console.log(`JSON size: ${(jsonSize / 1024).toFixed(2)} KB`);
-    console.log(`ZIP size: ${(zipSize / 1024).toFixed(2)} KB`);
-    console.log(`Compression ratio: ${((1 - zipSize / jsonSize) * 100).toFixed(2)}%`);
+    fs.writeFileSync("./src/data/users.zip", zipContent);
+    fs.unlinkSync(jsonPath);
 
-    if (fs.existsSync(zipPath)) {
-      fs.unlinkSync(jsonPath);
-      console.log("Successfully created ZIP and removed JSON file");
-    }
+    console.log(`Successfully generated users.zip`);
   } catch (error) {
     console.error("Error generating user stats:", error);
     throw error;

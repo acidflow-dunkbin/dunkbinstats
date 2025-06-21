@@ -4,7 +4,7 @@ import * as d3 from "npm:d3";
 export function mostPopularCosmeticsPlot(backpacks, width = 640) {
   const itemCounts = d3.rollup(
     backpacks.filter((d) => d?.item_name),
-    (v) => v.length,
+    (items) => new Set(items.map((d) => d.user_id)).size,
     (d) => d.item_name
   );
 
@@ -12,12 +12,16 @@ export function mostPopularCosmeticsPlot(backpacks, width = 640) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 15);
 
+  // Calculate dynamic margin based on longest item name
+  const maxLabelLength = Math.max(...topItems.map((d) => d.item.length));
+  const dynamicMargin = Math.max(120, Math.min(maxLabelLength * 6 + 15, 200));
+
   return Plot.plot({
     width,
     color: {
       scheme: "ylgnbu",
     },
-    marginLeft: Math.min(100, width * 0.15),
+    marginLeft: dynamicMargin,
     marginRight: Math.min(80, width * 0.12),
     x: {
       label: "Number of owners",
@@ -41,7 +45,7 @@ export function mostPopularCosmeticsPlot(backpacks, width = 640) {
           dy: -10,
           format: { opacity: false, type: false, fy: false, stroke: false },
         },
-        title: (d) => [`Cosmetic: ${d.item}`, `Has been bought: ${d.count.toLocaleString()} times`].join("\n\n"),
+        title: (d) => [`Cosmetic: ${d.item}`, `Owners: ${d.count.toLocaleString()}`].join("\n\n"),
       }),
       Plot.text(topItems, {
         y: "item",
