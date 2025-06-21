@@ -36,7 +36,10 @@ async function generateUserStats() {
       fetchData(pfp_map_url),
     ]);
 
-    const cosmeticsMap = new Map(cosmetics.map((c) => [c.id, c]));
+    const cosmeticsMap = new Map(
+      cosmetics.filter((c) => c.id !== 0 && c.id !== 161 && c.id !== 160).map((c) => [c.id, c])
+    );
+
     const usersMap = new Map(users.map((u) => [u.id, u]));
     const userStats = new Map();
 
