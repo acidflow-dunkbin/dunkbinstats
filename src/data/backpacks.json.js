@@ -9,7 +9,7 @@ const backpacks_url = "https://dunkbin.com/export/backpacks";
 const cosmetics_url = "https://dunkbin.com/export/cosmetics";
 const users_url = "https://dunkbin.com/export/users";
 
-// NEW: Endpoint for the PFP extension map
+// Endpoint for the PFP extension map
 const pfp_map_url = "https://dunkbinstats-users-images.acidflow.stream/pfp_map.json";
 
 const username = process.env.DUNKBIN_USER;
@@ -38,15 +38,20 @@ const layerMap = {
 
 async function generateBackpacksData() {
   try {
-    const [backpacks, cosmetics, users, pfpMap] = await Promise.all([
+    const [backpacks, cosmetics, users, pfpData] = await Promise.all([
       fetchData(backpacks_url),
       fetchData(cosmetics_url),
       fetchData(users_url),
       fetchData(pfp_map_url),
     ]);
 
-    const cosmeticsMap = new Map(cosmetics.map((c) => [c.id, c]));
+    const cosmeticsMap = new Map(
+      cosmetics.filter((c) => c.id !== 0 && c.id !== 161 && c.id !== 160).map((c) => [c.id, c])
+    );
+
     const usersMap = new Map(users.map((u) => [u.id, u]));
+
+    const pfpMap = pfpData.users;
 
     const enhancedBackpacks = backpacks
       .filter((item) => cosmeticsMap.has(item.item_id))
@@ -56,14 +61,14 @@ async function generateBackpacksData() {
         const authorInfo = usersMap.get(cosmetic.author);
 
         let userPfpFile = "no_image_available.png";
-        if (user && pfpMap[user.id]) {
-          userPfpFile = `${user.id}.${pfpMap[user.id]}`;
+        if (user && pfpMap && pfpMap[user.id] && pfpMap[user.id].pfp_filename) {
+          userPfpFile = pfpMap[user.id].pfp_filename;
         }
 
         return {
-          user_id: user.id,
-          user_login: user.login,
-          user_display_name: user.display_name,
+          user_id: item.user_id,
+          user_login: user ? user.login : "unknown",
+          user_display_name: user ? user.display_name : "Unknown User",
           user_pfp: userPfpFile,
           item_id: item.item_id,
           item_name: cosmetic.name,
