@@ -58,7 +58,9 @@ async function generateCosmeticsData() {
       }
     });
 
-    const filteredCosmetics = cosmetics.filter((cosmetic) => cosmetic.id !== 0);
+    const filteredCosmetics = cosmetics.filter(
+      (cosmetic) => cosmetic.id !== 0 && cosmetic.id !== 161 && cosmetic.id !== 160
+    );
     const cosmeticOwnership = new Map();
 
     backpacks.forEach((item) => {

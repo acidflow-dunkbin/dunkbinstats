@@ -86,12 +86,12 @@ cosmetics.forEach((cosmetic) => {
 ```
 
 ```js
-const totalSweatSpent = backpacks.reduce((sum, d) => {
-  const price = Number(d.item_price);
-  const qty = Number(d.quantity) || 1;
-  return sum + (isNaN(price) ? 0 : price * qty);
+const totalSweatSpent = user_stats.reduce((sum, user) => {
+  return sum + (user.total_items_cost || 0);
 }, 0);
+```
 
+```js
 const totalUniqueCosmetics = cosmetics.length;
 const totalArtists = new Set(
   cosmetics.filter((d) => d.author_name && d.author_name !== "Unknown").map((d) => d.author_name)
