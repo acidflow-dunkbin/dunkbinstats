@@ -4,7 +4,7 @@ import * as d3 from "npm:d3";
 export function mostPopularCosmeticsPlot(backpacks, width = 640) {
   const itemCounts = d3.rollup(
     backpacks.filter((d) => d?.item_name),
-    (items) => d3.sum(items, (d) => d.quantity || 0),
+    (items) => new Set(items.map((d) => d.user_id)).size,
     (d) => d.item_name
   );
 
@@ -41,7 +41,7 @@ export function mostPopularCosmeticsPlot(backpacks, width = 640) {
           dy: -10,
           format: { opacity: false, type: false, fy: false, stroke: false },
         },
-        title: (d) => [`Cosmetic: ${d.item}`, `Has been bought: ${d.count.toLocaleString()} times`].join("\n\n"),
+        title: (d) => [`Cosmetic: ${d.item}`, `Owners: ${d.count.toLocaleString()}`].join("\n\n"),
       }),
       Plot.text(topItems, {
         y: "item",
