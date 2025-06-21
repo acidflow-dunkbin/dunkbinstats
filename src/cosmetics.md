@@ -28,10 +28,6 @@ const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
 ```
 
-```js
-const buildTimestamp = new Date(buildDate.build_timestamp);
-```
-
 <h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
