@@ -8,16 +8,17 @@ title: Cosmetics
 <h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
-import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";
 import { wuoteLogo } from "./components/shared/wuoteLogo.js";
-import { topArtistsPlot } from "./components/cosmetics/topArtistsPlot.js";
-import { cosmeticLayerPopularityPlot } from "./components/cosmetics/cosmeticLayerPopularityPlot.js";
-import { mostPopularCosmeticsPlot } from "./components/cosmetics/mostPopularCosmeticsPlot.js";
-import { topExpensiveCosmeticsPlot } from "./components/cosmetics/topExpensiveCosmeticsPlot.js";
+import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";
+import { topCompletionistsPlot } from "./components/backpacks/topCompletionistsPlot.js";
+import { collectionCompletenessPlot } from "./components/backpacks/collectionCompletenessPlot.js";
+import { topSpendersPlot } from "./components/backpacks/topSpendersPlot.js";
 import JSZip from "jszip";
 
 initializeTitleAnimation();
+```
 
+```js
 const backpacksZip = await FileAttachment("./data/backpacks.zip").zip();
 const backpacks = await backpacksZip.file("backpacks.json").json();
 const cosmeticsZip = await FileAttachment("./data/cosmetics.zip").zip();
@@ -25,19 +26,27 @@ const cosmetics = await cosmeticsZip.file("cosmetics.json").json();
 const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
+```
 
-let pfpMapping = { users: {} }; 
+```js
+const buildTimestamp = new Date(buildDate.build_timestamp);
+```
+
+<h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
+
+```js
+let pfpMapping = { users: {} };
 
 try {
   const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
-  
+
   if (!pfpMappingResponse.ok) {
     throw new Error(`HTTP error! status: ${pfpMappingResponse.status}`);
   }
-  
+
   const pfpMappingArrayBuffer = await pfpMappingResponse.arrayBuffer();
   const pfpMappingZip = await JSZip.loadAsync(pfpMappingArrayBuffer);
-  
+
   const pfpMapFile = pfpMappingZip.file("pfp_map.json");
   if (pfpMapFile) {
     const pfpMappingText = await pfpMapFile.async("text");
