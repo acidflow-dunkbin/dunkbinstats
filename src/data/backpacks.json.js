@@ -49,7 +49,7 @@ async function generateBackpacksData() {
     const usersMap = new Map(users.map((u) => [u.id, u]));
 
     const enhancedBackpacks = backpacks
-      .filter((item) => cosmeticsMap.has(item.item_id) && usersMap.has(item.user_id))
+      .filter((item) => cosmeticsMap.has(item.item_id))
       .map((item) => {
         const cosmetic = cosmeticsMap.get(item.item_id);
         const user = usersMap.get(item.user_id);
