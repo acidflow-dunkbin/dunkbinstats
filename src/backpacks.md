@@ -80,9 +80,7 @@ const totalSweatSpent = backpacks.reduce((sum, d) => {
 
 ```js
 user_stats.forEach((user) => {
-  // Use the PFP mapping to get the correct filename
-  const pfpFilename = getPfpFilename(user.id);
-
+  const pfpFilename = getPfpFilename(user.user_id);
   user.combinedUserName = {
     twitchUsername: user.display_name,
     portrait_url: `https://dunkbinstats-users-images.acidflow.stream/users_pfps/${pfpFilename}`,
