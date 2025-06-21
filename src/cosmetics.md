@@ -8,11 +8,12 @@ title: Cosmetics
 <h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
-import { wuoteLogo } from "./components/shared/wuoteLogo.js";
 import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";
-import { topCompletionistsPlot } from "./components/backpacks/topCompletionistsPlot.js";
-import { collectionCompletenessPlot } from "./components/backpacks/collectionCompletenessPlot.js";
-import { topSpendersPlot } from "./components/backpacks/topSpendersPlot.js";
+import { wuoteLogo } from "./components/shared/wuoteLogo.js";
+import { topArtistsPlot } from "./components/cosmetics/topArtistsPlot.js";
+import { cosmeticLayerPopularityPlot } from "./components/cosmetics/cosmeticLayerPopularityPlot.js";
+import { mostPopularCosmeticsPlot } from "./components/cosmetics/mostPopularCosmeticsPlot.js";
+import { topExpensiveCosmeticsPlot } from "./components/cosmetics/topExpensiveCosmeticsPlot.js";
 import JSZip from "jszip";
 
 initializeTitleAnimation();
