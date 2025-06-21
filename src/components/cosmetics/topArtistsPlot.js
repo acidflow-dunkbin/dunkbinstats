@@ -16,6 +16,8 @@ export function topArtistsPlot(cosmetics, width = 640) {
   const maxLabelLength = Math.max(...topArtists.map((d) => d.artist.length));
   const dynamicMargin = Math.max(120, Math.min(maxLabelLength * 6 + 15, 200));
 
+  const fontSize = width < 500 ? 12 : 14;
+
   return Plot.plot({
     width,
     color: {
@@ -53,7 +55,7 @@ export function topArtistsPlot(cosmetics, width = 640) {
         text: (d) => d.count,
         textAnchor: "start",
         dx: 5,
-        fontSize: width < 500 ? 12 : 14,
+        fontSize: fontSize,
       }),
     ],
   });

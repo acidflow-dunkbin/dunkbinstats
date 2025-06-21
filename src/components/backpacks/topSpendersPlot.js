@@ -7,17 +7,17 @@ export function topSpendersPlot(userData, width = 640) {
     .sort((a, b) => b.total_items_cost - a.total_items_cost)
     .slice(0, 15);
 
-  // Responsive design adjustments
-  const isMobile = width < 500;
-  const marginLeft = isMobile ? 80 : 120;
-  const marginRight = isMobile ? 80 : 120;
-  const fontSize = isMobile ? 12 : 14;
+  // Calculate dynamic margin based on longest username
+  const maxLabelLength = Math.max(...topSpenders.map((d) => d.display_name.length));
+  const dynamicMarginLeft = Math.max(120, Math.min(maxLabelLength * 6 + 15, 200));
+
+  const fontSize = width < 500 ? 12 : 14;
 
   return Plot.plot({
     width,
     height: 400,
-    marginLeft,
-    marginRight,
+    marginLeft: dynamicMarginLeft,
+    marginRight: Math.max(120, width * 0.15),
     marginTop: 20,
     marginBottom: 40,
     color: {
@@ -37,7 +37,6 @@ export function topSpendersPlot(userData, width = 640) {
         x: "total_items_cost",
         fill: "total_items_cost",
         sort: { y: "x", reverse: true },
-        rx: 3,
         tip: {
           lineWidth: 300,
           textPadding: 12,
@@ -57,22 +56,16 @@ export function topSpendersPlot(userData, width = 640) {
             `Collection progress: ${d.collection_completion_percentage}% complete`,
           ].join("\n\n"),
       }),
-      // Only show text labels if there's enough space
-      ...(width > 400
-        ? [
-            Plot.text(topSpenders, {
-              y: "display_name",
-              x: "total_items_cost",
-              text: (d) =>
-                isMobile ? d3.format("~s")(d.total_items_cost) + "💧" : `${d.total_items_cost.toLocaleString()}💧`,
-              textAnchor: "start",
-              dx: 5,
-              fontSize: fontSize - 1,
-              fill: "currentColor",
-              fillOpacity: 0.8,
-            }),
-          ]
-        : []),
+      Plot.text(topSpenders, {
+        y: "display_name",
+        x: "total_items_cost",
+        text: (d) => `${d.total_items_cost.toLocaleString()}💧`,
+        textAnchor: "start",
+        dx: 5,
+        fontSize: fontSize,
+        fill: "currentColor",
+        fillOpacity: 0.8,
+      }),
       Plot.ruleX([0]),
     ],
   });
