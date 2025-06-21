@@ -15,9 +15,7 @@ import { topSpendersPlot } from "./components/backpacks/topSpendersPlot.js";
 import JSZip from "jszip";
 
 initializeTitleAnimation();
-```
 
-```js
 const backpacksZip = await FileAttachment("./data/backpacks.zip").zip();
 const backpacks = await backpacksZip.file("backpacks.json").json();
 const cosmeticsZip = await FileAttachment("./data/cosmetics.zip").zip();
@@ -25,6 +23,26 @@ const cosmetics = await cosmeticsZip.file("cosmetics.json").json();
 const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
+
+// Load remote PFP mapping
+let pfpMapping = { users: {} };
+
+try {
+  const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
+
+  if (pfpMappingResponse.ok) {
+    const pfpMappingArrayBuffer = await pfpMappingResponse.arrayBuffer();
+    const pfpMappingZip = await JSZip.loadAsync(pfpMappingArrayBuffer);
+    const pfpMapFile = pfpMappingZip.file("pfp_map.json");
+
+    if (pfpMapFile) {
+      const pfpMappingText = await pfpMapFile.async("text");
+      pfpMapping = JSON.parse(pfpMappingText);
+    }
+  }
+} catch (error) {
+  console.error("Failed to load PFP mapping:", error);
+}
 ```
 
 ```js
@@ -32,31 +50,6 @@ const buildTimestamp = new Date(buildDate.build_timestamp);
 ```
 
 <h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
-
-```js
-let pfpMapping = { users: {} };
-
-try {
-  const pfpMappingResponse = await fetch("https://dunkbinstats-users-images.acidflow.stream/pfp_map.zip");
-
-  if (!pfpMappingResponse.ok) {
-    throw new Error(`HTTP error! status: ${pfpMappingResponse.status}`);
-  }
-
-  const pfpMappingArrayBuffer = await pfpMappingResponse.arrayBuffer();
-  const pfpMappingZip = await JSZip.loadAsync(pfpMappingArrayBuffer);
-
-  const pfpMapFile = pfpMappingZip.file("pfp_map.json");
-  if (pfpMapFile) {
-    const pfpMappingText = await pfpMapFile.async("text");
-    pfpMapping = JSON.parse(pfpMappingText);
-  } else {
-    console.warn("pfp_map.json not found in ZIP file");
-  }
-} catch (error) {
-  console.error("Failed to load PFP mapping:", error);
-}
-```
 
 ```js
 const totalUniqueItems = cosmetics.length;
@@ -75,7 +68,7 @@ const totalSweatSpent = backpacks.reduce((sum, d) => {
 ```js
 // Helper function to get PFP filename from mapping
 function getPfpFilename(userId) {
-  if (!userId || !pfpMapping.users[userId]) {
+  if (!userId || !pfpMapping.users || !pfpMapping.users[userId]) {
     return "no_image_available.png";
   }
   return pfpMapping.users[userId].pfp_filename || "no_image_available.png";
