@@ -166,7 +166,7 @@ const citbTable = Inputs.table(citbSearchValue, {
 });
 ```
 
-<div class="warning" label="⚠️ Stale Data! ⚠️">Ask DunkOrSlam to automate Dunkbin users JSON-based "database" sharing so these charts can be up to date!</div>
+<div class="warning" label="⚠️ Stale Data! ⚠️">Ask DunkOrSlam to automate Dunkbot users JSON-based "database" sharing so these charts can be up to date!</div>
 <div class="grid grid-cols-4" style="grid-auto-rows: auto;">
   <div class="card grid-colspan-2"><h2>Longest winstreaks and losestreaks</h2>${combinedChampions}</div>
   <div class="card grid-colspan-2"><h2>Streak vs CITB Relationship</h2>${streakVsCitbPlot}</div>
