@@ -18,4 +18,4 @@ const buildTimestamp = new Date(buildDate.build_timestamp);
 <h1 id="cosmeticsTitle" class="acid-title bartender-heading-decrypted acidTitleCosmetic">Dupes finder</h1>
 
 <h2>Coming soon…</h2>
-<h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
+<h6 id="cosmeticsTitle">Last updated: ${buildTimestamp.toLocaleString()}</h6>

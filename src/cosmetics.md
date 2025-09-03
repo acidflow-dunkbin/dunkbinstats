@@ -5,7 +5,7 @@ title: Cosmetics
 <link href="custom.css" rel="stylesheet"></link>
 
 <h1 id="cosmeticsTitle" class="acid-title bartender-heading-decrypted acidTitleCosmetic">Cosmetics</h1>
-<h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
+<h6 id="cosmeticsTitle">Last updated: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
 import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";
@@ -14,6 +14,7 @@ import { topArtistsPlot } from "./components/cosmetics/topArtistsPlot.js";
 import { cosmeticLayerPopularityPlot } from "./components/cosmetics/cosmeticLayerPopularityPlot.js";
 import { mostPopularCosmeticsPlot } from "./components/cosmetics/mostPopularCosmeticsPlot.js";
 import { topExpensiveCosmeticsPlot } from "./components/cosmetics/topExpensiveCosmeticsPlot.js";
+import { cosmeticPricesOverTimePlot } from "./components/cosmetics/cosmeticPricesOverTimePlot.js";
 import JSZip from "jszip";
 
 initializeTitleAnimation();
@@ -27,6 +28,7 @@ const cosmetics = await cosmeticsZip.file("cosmetics.json").json();
 const usersZip = await FileAttachment("./data/users.zip").zip();
 const user_stats = await usersZip.file("users.json").json();
 const buildDate = await FileAttachment("./data/buildDate.json").json();
+const cosmeticDates = await FileAttachment("./data/cosmetics/cosmetic_dates.csv").csv({ typed: true });
 ```
 
 ```js
@@ -248,6 +250,12 @@ const cosmeticsTable = Inputs.table(cosmeticsSearchValue, {
   </div>
 </div>
 
+<div class="card" style="margin-bottom: 2rem;">
+  <h2>Cosmetic Prices Over Time</h2>
+  <h3>Note: Historical data incomplete. Dates estimated. Prices shown are current values only</h3>
+  ${resize((width) => cosmeticPricesOverTimePlot(cosmetics, cosmeticDates, width))}
+</div>
+
 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
   <div class="card">
     <h2>Top 15 most expensive cosmetics</h2>
@@ -258,6 +266,8 @@ const cosmeticsTable = Inputs.table(cosmeticsSearchValue, {
     ${resize((width) => cosmeticLayerPopularityPlot(cosmetics, width))}
   </div>
 </div>
+
+
 
 <div class="card" style="margin-bottom: 1rem;">
   <h2>Cosmetic Search & Browse</h2>

@@ -5,7 +5,7 @@ title: Baka- and Winstreak Champions
 <link href="custom.css" rel="stylesheet"></link>
 
 <h1 id="citbTitle" class="acid-title bartender-heading-decrypted">Winstreakers & CITB Hoarders</h1>
-<h6 id="cosmeticsTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
+<h6 id="cosmeticsTitle">Last updated: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
 import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";

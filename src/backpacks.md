@@ -5,7 +5,7 @@ title: Backpacks
 <link href="custom.css" rel="stylesheet"></link>
 
 <h1 id="backpacksTitle" class="acid-title bartender-heading-decrypted">Backpacks</h1>
-<h6 id="backpacksTitle">Built at: ${buildTimestamp.toLocaleString()}</h6>
+<h6 id="backpacksTitle">Last updated: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
 import { wuoteLogo } from "./components/shared/wuoteLogo.js";
