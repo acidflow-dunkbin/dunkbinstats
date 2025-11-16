@@ -5,7 +5,7 @@ title: Cosmetics
 <link href="custom.css" rel="stylesheet"></link>
 
 <h1 id="cosmeticsTitle" class="acid-title bartender-heading-decrypted acidTitleCosmetic">Cosmetics</h1>
-<h6 id="cosmeticsTitle">Last updated: ${buildTimestamp.toLocaleString()}</h6>
+<h6 id="cosmeticsTitle">Last compiled: ${buildTimestamp.toLocaleString()}</h6>
 
 ```js
 import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";
