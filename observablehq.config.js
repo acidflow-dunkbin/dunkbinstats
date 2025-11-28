@@ -34,7 +34,7 @@ export default {
   theme: ["ocean-floor", "wide"],
   // header: "Dunkbin Stats 2.0 by WUOTE", // what to show in the header (HTML)  footer:
   footer:
-    '<br /><br /><div class="footer-container"><div style="display: flex; align-items: center; gap: 8px;">Made by<a href="https://www.twitch.tv/WUOTE"><img src="https://noita-bartender-images.acidflow.stream/images/logo/WUOTE_LOGO.svg" style="width:100px;"></a></div><div class="bg-glow rounded-full inline-block"><a href="https://runfast.stream/donate/"><div id="dono-button" class="overflow-hidden bg-main text-white border border-2 border-white rounded-full px-6 py-3">Donate</div></a><div class="bg-glow-inner"></div></div></div>', // what to show in the footer (HTML)
+    '<div style="display: flex; align-items: center; gap: 2px;">Made by<a href="https://www.twitch.tv/WUOTE"><img src="https://noita-bartender-images.acidflow.stream/images/logo/WUOTE_LOGO.svg" style="width:100px;"></a>',
   sidebar: true, // whether to show the sidebar
   toc: false, // whether to show the table of contents
   pager: false, // whether to show previous & next links in the footer
