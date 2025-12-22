@@ -4,7 +4,7 @@ import * as d3 from "npm:d3";
 export function topCompletionistsPlot(userData, width = 640) {
   const topHoarders = userData
     .filter((user) => user?.collection_completion_percentage)
-    .sort((a, b) => b.collection_completion_percentage - a.collection_completion_percentage)
+    .sort((a, b) => b.unique_items_owned - a.unique_items_owned)
     .slice(0, 15);
 
   // Calculate dynamic margin based on longest username
@@ -30,13 +30,13 @@ export function topCompletionistsPlot(userData, width = 640) {
     y: {
       label: null,
       tickSize: 0,
+      domain: topHoarders.map((d) => d.display_name),
     },
     marks: [
       Plot.barX(topHoarders, {
         y: "display_name",
         x: "collection_completion_percentage",
         fill: "collection_completion_percentage",
-        sort: { y: "x", reverse: true },
         tip: {
           lineWidth: 300,
           textPadding: 12,
