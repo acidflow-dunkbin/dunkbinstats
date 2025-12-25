@@ -15,12 +15,16 @@ export default {
       ],
     },
     {
-      name: "Stale Data",
-      pages: [{ name: "CITBs and Winstreaks", path: "/winstreaks" }],
-    },
-    {
       name: "Cosmetic Trading",
       pages: [{ name: "Dupe finder", path: "/dupes" }],
+    },
+    {
+      name: "Work in progress",
+      pages: [{ name: "Bet results", path: "/bets" }],
+    },
+    {
+      name: "Stale Data",
+      pages: [{ name: "CITBs and Winstreaks", path: "/winstreaks" }],
     },
   ],
 

@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf src/.observablehq/cache",
-    "prebuild": "node src/data/backpacks.json.js && node src/data/cosmetics.json.js && node src/data/users.json.js",
+    "prebuild": "node src/data/backpacks.json.js && node src/data/cosmetics.json.js && node src/data/users.json.js && node src/data/bets.csv.js",
     "build": "observable build",
     "dev": "observable preview",
     "deploy": "observable deploy",
