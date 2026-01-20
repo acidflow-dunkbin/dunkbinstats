@@ -11,7 +11,7 @@ title: Bets
 import { initializeTitleAnimation } from "./components/shared/titleAnimation.js";
 import { wuoteLogo } from "./components/shared/wuoteLogo.js";
 import { categoriesPlot } from "./components/bets/categoriesPlot.js";
-import { categoriesPlot2 } from "./components/bets/categoriesPlot2.js";
+
 import { dateDurationPlot } from "./components/bets/dateDurationPlot.js";
 import JSZip from "jszip";
 
@@ -121,10 +121,6 @@ const betsTable = Inputs.table(bets);
   <div class="card">
     <h2>Bets by Category</h2>
     ${resize((width) => categoriesPlot(bets, width))}
-  </div>
-  <div class="card">
-    <h2>Bets by Category</h2>
-    ${resize((width) => categoriesPlot2(bets, width))}
   </div>
 </div>
 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
