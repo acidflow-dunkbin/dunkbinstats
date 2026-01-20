@@ -40,97 +40,72 @@ const distinctCategories =
 ```
 
 ```js
-const betsTable = Inputs.table(bets);
+const betsTable = Inputs.table(bets, {
+  width: {
+    title: 250,
+    date: 120,
+    duration: 120,
+    yes_votes: 60,
+    no_votes: 60,
+    winners: 60,
+    losers: 60,
+    outcome: 60,
+    category: 150,
+  },
+  align: {
+    title: "left",
+    date: "left",
+    duration: "left",
+    yes_votes: "right",
+    no_votes: "right",
+    winners: "right",
+    losers: "right",
+    outcome: "left",
+    category: "left",
+  },
+  sort: "date",
+  reverse: true,
+  select: false,
+  multiple: false,
+  rows: 44,
+  columns: ["title", "date", "duration", "yes_votes", "no_votes", "winners", "losers", "outcome", "category"],
+  header: {
+    title: "Bet",
+    date: "Bet started at",
+    duration: "Bet duration",
+    yes_votes: "Believers",
+    no_votes: "Doubters",
+    winners: "Winners",
+    losers: "Losers",
+    outcome: "Outcome",
+    category: "Category",
+  },
+  format: {
+    outcome: (d) => {
+      const outcomeColors = {
+        Won: "oklch(43.2% 0.095 166.913)",
+        Lost: "oklch(44.4% 0.177 26.899)",
+      };
+      const color = outcomeColors[d];
+      return color ? html`<span style="color: ${color}">${d}</span>` : d;
+    },
+  },
+});
 ```
 
-```js
-// Reuse the table formatting I've come up with for other pages
-
-// , {
-//   width: {
-//     image: sweatlingSizeSelectorInputValue,
-//     name: 200,
-//     layer_name: 70,
-//     combinedArtistName: 150,
-//   },
-//   align: {
-//     image: "center",
-//     author_pfp: "right",
-//     author_name: "left",
-//     price: "right",
-//     total_owned: "right",
-//     unique_owners: "right",
-//     total_market_value: "right",
-//     id: "right",
-//   },
-//   sort: "id",
-//   reverse: true,
-//   select: false,
-//   multiple: false,
-//   rows: 14,
-//   columns: [
-//     "image",
-//     "combinedCosmeticName",
-//     "layer_name",
-//     "combinedArtistName",
-//     "price",
-//     "total_owned",
-//     "unique_owners",
-//     "total_market_value",
-//     "id",
-//   ],
-//   header: {
-//     image: "Art",
-//     combinedCosmeticName: "Name",
-//     layer_name: "Layer",
-//     combinedArtistName: "Artist",
-//     price: "Price💧",
-//     total_owned: "Owned total",
-//     unique_owners: "# Of owners",
-//     total_market_value: "Spent💧",
-//     id: "ID",
-//   },
-//   format: {
-//     combinedCosmeticName: (d) =>
-//       htl.html`<a href="https://dunkbin.com/shop?items=${d.id}" target="_blank" rel="noopener noreferrer" >${d.name}</a>`,
-//     price: (d) => `${d.toLocaleString()}💧`,
-//     total_market_value: (d) => `${d.toLocaleString()}💧`,
-//     image: (d) =>
-//       htl.html`<div style="position: relative; width: ${sweatlingSizeSelectorInputValue}px; height: ${sweatlingSizeSelectorInputValue}px; overflow: hidden;">
-//           <img src="http://dunkbinstats-images.acidflow.stream/img/sweatling.png" width=${sweatlingSizeSelectorInputValue} height=${sweatlingSizeSelectorInputValue} style="image-rendering: pixelated; position: absolute; top: 0; left: 0;" />
-//           <img src="http://dunkbinstats-images.acidflow.stream/img/${d}" width=${sweatlingSizeSelectorInputValue} height=${sweatlingSizeSelectorInputValue} style="image-rendering: pixelated; position: absolute; top: 0; left: 0;" />
-//         </div>`,
-//     combinedArtistName: (d) => {
-//       const content = htl.html`<div style="width: ${sweatlingSizeSelectorInputValue / 3}px; height: ${
-//         sweatlingSizeSelectorInputValue / 3
-//       }px; display: flex; align-items: center; gap: 8px; min-width: fit-content;">
-//         <img src="${d.portrait_url}"
-//           width=${sweatlingSizeSelectorInputValue / 3}
-//           height=${sweatlingSizeSelectorInputValue / 3}
-//           style="image-rendering:pixelated; flex-shrink: 0;"
-//           onerror="this.src='https://dunkbinstats-users-images.acidflow.stream/users_pfps/no_image_available.png'" />
-//         <span style="white-space: nowrap; color: currentColor;">${d.artistName}</span>
-//       </div>`;
-//       return d.twitch_url ? htl.html`<a href="${d.twitch_url}">${content}</a>` : content;
-//     },
-//   },
-// });
-```
-
-<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-  <div class="card">
+<div class="grid grid-cols-4" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+  <div class="card grid-colspan-2">
     <h2>Bets by Category</h2>
     ${resize((width) => categoriesPlot(bets, width))}
   </div>
+<div class="card grid-colspan-2" style="padding: 0; overflow: hidden;">
+  <h2 style="margin-left: 1rem; margin-top: 1rem; margin-bottom: 1rem;">Bet Results</h2>
+  ${betsTable}
+</div>
 </div>
 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-  <div class="card">
+  <div class="card grid-rowspan-1">
     <h2>DRAFT: Bet Duration Over Time</h2>
     ${resize((width) => dateDurationPlot(bets, width))}
   </div>
-</div>
-
-<div class="card" style="padding: 0; overflow: hidden;">
-  <h2 style="margin-left: 1rem; margin-top: 1rem; margin-bottom: 1rem;">DRAFT: Bets resutls table</h2>
-  ${betsTable}
 </div>
