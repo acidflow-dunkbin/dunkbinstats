@@ -194,7 +194,7 @@ const usersTable = Inputs.table(usersSearchValue, {
   ${resize((width) => collectionCompletenessPlot(user_stats, width))}
 </div>
 
-<div class="tip" label="ℹ️ Can't find yourself in the table? ℹ️">Go to <a href="https://dunkbin.com/">Dunkbin</a> and log in, in <code>~2</code> hours your records will show up!</div>
+<div class="tip" label="ℹ️ Can't find yourself in the table? ℹ️">Go to <a href="https://dunkbin.com/">Dunkbin</a> and log in, after a day your records will show up!</div>
 <div class="card" style="margin-bottom: 1rem;">
   <h2>User Search & Statistics</h2>
   <div style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 1rem; flex-wrap: wrap;">
