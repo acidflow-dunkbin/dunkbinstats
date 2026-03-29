@@ -26,11 +26,60 @@ export default {
       name: "Stale Data",
       pages: [{ name: "CITBs and Winstreaks", path: "/winstreaks" }],
     },
+    {
+      name: "Source Code",
+      pages: [
+        {
+          name: "GitHub",
+          path: "https://github.com/acidflow-dunkbin/dunkbinstats/",
+        },
+      ],
+    },
   ],
 
   // Content to add to the head of the page, e.g. for a favicon:
-  head: '<link rel="icon" href="WUOTE.png" type="image/png" sizes="32x32">',
-
+  head: `<link rel="icon" href="WUOTE.png" type="image/png" sizes="32x32">,
+<style>
+  nav a[href="https://runfast.stream/"],
+  nav a[href="https://runfast.stream/"]:hover,
+  nav a[href="https://runfast.stream/"]:focus,
+  nav a[href="https://runfast.stream/"]:active {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    text-indent: -9999px !important;
+    overflow: hidden !important;
+  }
+  nav a[href="https://runfast.stream/"]::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 100% !important;
+    height: 1.2em !important;
+    background-image: url("https://noita-bartender-images.acidflow.stream/images/logo/runfast-logo.svg") !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: left center !important;
+  }
+  nav a[href="https://github.com/acidflow-dunkbin/dunkbinstats/"],
+  nav a[href="https://github.com/acidflow-dunkbin/dunkbinstats/"]:hover,
+  nav a[href="https://github.com/acidflow-dunkbin/dunkbinstats/"]:focus,
+  nav a[href="https://github.com/acidflow-dunkbin/dunkbinstats/"]:active {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5em !important;
+    width: 100% !important;
+  }
+  nav a[href="https://github.com/acidflow-dunkbin/dunkbinstats/"]::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 1.2em !important;
+    height: 1.2em !important;
+    background-image: url("https://noita-bartender-images.acidflow.stream/images/icons/github.svg") !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+</style>`,
   // The path to the source root.
   root: "src",
 
